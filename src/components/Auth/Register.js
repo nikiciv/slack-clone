@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import firebase from '../../firebase';
+import md5 from 'md5';
 import { Grid, Form, Segment, Button, Header, Message, Icon } from 'semantic-ui-react';
 
 class Register extends React.Component {
@@ -11,6 +12,7 @@ class Register extends React.Component {
         passwordConfirmation: '',
         errors: [],   
         loading: false,
+        usersRef: firebase.database().ref('users'),
     };
 
     handleChange = event => {
@@ -63,8 +65,22 @@ class Register extends React.Component {
                 .auth()
                 .createUserWithEmailAndPassword(this.state.email, this.state.password)
                 .then(createdUser => {
-                    this.setState({ loading: false });
+                    
                     console.log('createdUser', createdUser);
+                    createdUser.user.updateProfile({
+                        displayName: this.state.username,
+                        photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`
+                    })
+                    .then(() => {
+                        this.saveUser(createdUser).then(() => {
+                            this.setState({ loading: false });
+                            console.log('userSaved');                            
+                        })
+                    })
+                    .catch(err => {
+                        this.setState({ errors: this.state.errors.concat(err), loading: false });
+                        console.error(err);
+                    })
                 })
                 .catch(err => {
                     this.setState({ errors: this.state.errors.concat(err), loading: false });
@@ -82,6 +98,13 @@ class Register extends React.Component {
                 ? 'error' 
                 : '';
     };
+
+    saveUser = createdUser => {
+        return this.state.usersRef.child(createdUser.user.uid).set({
+            name: createdUser.user.displayName,
+            avatar: createdUser.user.photoURL,
+        });
+    }
 
     render() {  
         const { username, email, password, passwordConfirmation, errors, loading  } = this.state;
