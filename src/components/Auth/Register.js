@@ -170,7 +170,7 @@ class Register extends React.Component {
                             >
                                 Submit
                             </Button>
-                            <Message>Already a user?<Link to="/login"> Login</Link></Message>
+                            <Message>Already a user? <Link to="/login">Login</Link></Message>
                         </Segment>
                     </Form>
                     {
