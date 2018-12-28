@@ -4,7 +4,15 @@ body {
   padding: 0;
 }
 
+.app {
+  height: 100vh;
+  /* background: #eee; */
+  /* padding: 1em; */
+}
+
 .register {
   height: 100vh;
   background: #eee;
 }
+
+

@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Switch, Route, withRouter } from 'react-router-dom';
+import { Loader, Dimmer } from 'semantic-ui-react';
 import './index.css';
 import App from './components/App';
 import Login from './components/Auth/Login';
@@ -22,7 +23,7 @@ class Root extends React.Component {
     componentDidMount() {
         firebase.auth().onAuthStateChanged(user => {
             if(user) {
-                console.log(user);
+                console.log('isLoading', this.props.isLoading);
                 this.props.setUser(user);
                 this.props.history.push('/');
             }
@@ -30,17 +31,28 @@ class Root extends React.Component {
     }
 
     render() {
-        return(
-            <Switch>
-                <Route exact path="/" component={App}/>
-                <Route path="/login" component={Login}/>
-                <Route path="/register" component={Register}/>
-            </Switch>
-        )
+        return this.props.isLoading ? 
+            (
+                <Dimmer active>
+                    <Loader size="huge" content="Preparing Chat..." />
+                </Dimmer>
+            )
+            : 
+            (
+                <Switch>
+                    <Route exact path="/" component={App}/>
+                    <Route path="/login" component={Login}/>
+                    <Route path="/register" component={Register}/>
+                </Switch>
+            )
     }
 };
 
-const RootWithAuth = withRouter(connect(null, { setUser })(Root));
+const mapStateToProps = state => ({
+    isLoading: state.user.isLoading,
+});
+
+const RootWithAuth = withRouter(connect(mapStateToProps, { setUser })(Root));
 
 
 ReactDOM.render(
