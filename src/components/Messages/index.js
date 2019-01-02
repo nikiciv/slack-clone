@@ -17,7 +17,6 @@ class Messages extends React.Component {
 
   componentDidMount() {
     const { channel, user } = this.state;
-    console.log(channel, user);
     if (channel && user) {
       this.addListeners(channel.id);
     }
