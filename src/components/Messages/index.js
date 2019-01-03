@@ -88,8 +88,6 @@ class Messages extends React.Component {
     }
   }
 
-
-
   render() {
     const { messagesRef, messages, numUniqueUsers, searchTerm, searchResults, searchLoading } = this.state;
     const { currentChannel, currentUser } = this.props;
