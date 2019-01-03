@@ -12,6 +12,9 @@ class Messages extends React.Component {
     messages: [],
     messagesLoading: true,
     numUniqueUsers: '',
+    searchTerm: '',
+    searchLoading: false,
+    searchResults: [],
   };
 
   componentDidMount() {
@@ -61,10 +64,34 @@ class Messages extends React.Component {
 
   displayChannelName = currentChannel => currentChannel ? `#${currentChannel.name}` : '';
 
+  handleSearchChange = event => {
+    this.setState({
+      searchTerm: event.target.value,
+      searchLoading: true,
+    }, () => this.handleSearchMessages());
+  };
+
+  handleSearchMessages = () => {
+    //in order to be sure to not mutate the messages
+    const channelMessages = [...this.state.messages];
+    const regex = new RegExp(this.state.searchTerm, 'gi');
+    if(channelMessages) { 
+      const searchResults = channelMessages.reduce((acc, message) => {
+        // eslint-disable-next-line
+        if(message.content && message.content.match(regex) || message.user.name.match(regex)) {
+          acc.push(message);
+        }
+        return acc;
+      }, []);
+    this.setState({ searchResults });
+    setTimeout(() => this.setState({ searchLoading: false}), 500);
+    }
+  }
+
 
 
   render() {
-    const { messagesRef, messages, numUniqueUsers } = this.state;
+    const { messagesRef, messages, numUniqueUsers, searchTerm, searchResults, searchLoading } = this.state;
     const { currentChannel, currentUser } = this.props;
 
     return (
@@ -72,10 +99,16 @@ class Messages extends React.Component {
         <MessagesHeader 
           channelName={this.displayChannelName(currentChannel)}
           numUniqueUsers={numUniqueUsers} 
+          onSearchChange={this.handleSearchChange}
+          searchLoading={searchLoading}
         />
         <Segment>
           <Comment.Group className="messages">
-            {this.displayMessages(messages)}
+            {searchTerm ? 
+              this.displayMessages(searchResults)
+            : 
+              this.displayMessages(messages)
+            }
           </Comment.Group>
         </Segment>
 
