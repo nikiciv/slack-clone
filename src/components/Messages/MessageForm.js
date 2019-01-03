@@ -48,8 +48,8 @@ class MessageForm extends React.Component {
 
     uploadFile = (file, metadata) => {
         const pathToUpload = this.props.currentChannel.id;
-        const ref = this.props.messagesRef;
-        const filePath = `chat/public/${uuid()}.jpg`;
+        const ref = this.props.getMessagesRef();
+        const filePath = `${this.getPath()}/${uuid()}.jpg`;
 
         this.setState(
         {
@@ -109,12 +109,12 @@ class MessageForm extends React.Component {
     }
 
     sendMessage = () => {
-        const { messagesRef, currentChannel } = this.props;
+        const { getMessagesRef, currentChannel } = this.props;
         const { message } = this.state;
 
         if(message) {
             this.setState({ loading: true });
-            messagesRef
+            getMessagesRef()
                 .child(currentChannel.id)
                 .push()
                 .set(this.createMessage())
@@ -137,6 +137,14 @@ class MessageForm extends React.Component {
             this.setState({
                 errors: this.state.errors.concat({ message: 'Add a message.' })
             })
+        }
+    }
+
+    getPath = () => {
+        if(this.props.isPrivateChannel) {
+            return `chat/private-${this.props.currentChannel.id}`;
+        } else {
+            return 'chat-public';
         }
     }
 
