@@ -11,14 +11,13 @@ class Messages extends React.Component {
     messagesRef: firebase.database().ref("messages"),
     messages: [],
     messagesLoading: true,
-    channel: this.props.currentChannel,
-    user: this.props.currentUser
+    numUniqueUsers: '',
   };
 
   componentDidMount() {
-    const { channel, user } = this.state;
-    if (channel && user) {
-      this.addListeners(channel.id);
+    const { currentChannel, currentUser } = this.props;
+    if (currentChannel && currentUser) {
+      this.addListeners(currentChannel.id);
     }
   }
 
@@ -34,8 +33,21 @@ class Messages extends React.Component {
         messages: loadedMessages,
         messagesLoading: false
       });
+      this.countUniqueUsers(loadedMessages);
     });
   };
+
+  countUniqueUsers = loadedMessages => {
+    const uniqueUsers = loadedMessages.reduce((acc, message) => {
+      if(!acc.includes(message.user.name)) {
+        acc.push(message.user.name);
+      }
+      return acc;
+    }, []);
+    const plural = uniqueUsers.length > 1 || uniqueUsers.length === 0;
+    const numUniqueUsers = `${uniqueUsers.length} user${plural ? 's': ''}`;
+    this.setState({ numUniqueUsers });
+  }
 
   displayMessages = messages =>
     messages.length > 0 &&
@@ -43,17 +55,24 @@ class Messages extends React.Component {
       <Message
         key={message.timestamp}
         message={message}
-        user={this.state.user}
+        user={this.props.currentUser}
       />
-    ));
+  ));
+
+  displayChannelName = currentChannel => currentChannel ? `#${currentChannel.name}` : '';
+
+
 
   render() {
-    const { messagesRef, messages, channel, user } = this.state;
+    const { messagesRef, messages, numUniqueUsers } = this.state;
+    const { currentChannel, currentUser } = this.props;
 
     return (
       <React.Fragment>
-        <MessagesHeader />
-
+        <MessagesHeader 
+          channelName={this.displayChannelName(currentChannel)}
+          numUniqueUsers={numUniqueUsers} 
+        />
         <Segment>
           <Comment.Group className="messages">
             {this.displayMessages(messages)}
@@ -62,8 +81,8 @@ class Messages extends React.Component {
 
         <MessageForm
           messagesRef={messagesRef}
-          currentChannel={channel}
-          currentUser={user}
+          currentChannel={currentChannel}
+          currentUser={currentUser}
         />
       </React.Fragment>
     );
