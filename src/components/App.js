@@ -7,7 +7,7 @@ import SidePanel from './SidePanel';
 import MetaPanel from './MetaPanel';
 import Messages from './Messages';
 
-const App = ({ currentUser, currentChannel, isPrivateChannel }) => (
+const App = ({ currentUser, currentChannel, isPrivateChannel, userPosts }) => (
   <Grid columns="equal" className="app" style={{ margin: 0, background: '#eee'}}>
     <ColorPanel />
     <SidePanel 
@@ -32,6 +32,7 @@ const App = ({ currentUser, currentChannel, isPrivateChannel }) => (
         key={currentChannel && currentChannel.id}
         isPrivateChannel={isPrivateChannel}
         currentChannel={currentChannel}
+        userPosts={userPosts}
       />
     </Grid.Column>
   </Grid>
@@ -41,6 +42,7 @@ const mapSatateToProps = state => ({
   currentUser: state.user.currentUser,
   currentChannel: state.channel.currentChannel,
   isPrivateChannel: state.channel.isPrivateChannel,
+  userPosts: state.channel.userPosts,
 });
 
 export default connect(mapSatateToProps)(App);

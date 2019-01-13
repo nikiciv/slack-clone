@@ -1,5 +1,5 @@
 import React from 'react';
-import { Segment, Header, Accordion, Icon, Image } from 'semantic-ui-react';
+import { Segment, Header, Accordion, Icon, Image, List } from 'semantic-ui-react';
 
 class MetaPanel extends React.Component {
     state = {
@@ -12,9 +12,28 @@ class MetaPanel extends React.Component {
         const newIndex = activeIndex === index ? -1 : index;
         this.setState({ activeIndex: newIndex });
     }
+
+    formatCount = num => (num > 1 || num === 0) ? `${num} posts` : `${num} post`;
+
+    displayTopPosters = userPosts => (
+        Object.entries(userPosts)
+            .sort((a, b) => b[1] - a[1])
+            .map(([key, val], index) => (
+                <List.Item key={index}>
+                    <Image avatar src={val.avatar} />
+                    <List.Content>
+                        <List.Header as="a">{key}</List.Header>
+                        <List.Description>{this.formatCount(val.count)}</List.Description>
+                    </List.Content>
+                </List.Item>
+            ))
+            //get only top 5 posters
+            .slice(0, 5)
+    );
+
     render() {
         const { activeIndex } = this.state;
-        const { isPrivateChannel, currentChannel } = this.props;
+        const { isPrivateChannel, currentChannel, userPosts } = this.props;
 
         if(isPrivateChannel || !currentChannel) return null;
         
@@ -47,7 +66,10 @@ class MetaPanel extends React.Component {
                         Top Posters
                     </Accordion.Title>
                     <Accordion.Content active={activeIndex === 1}>
-                        posters   
+                    
+                        <List>
+                            {userPosts && this.displayTopPosters(userPosts)}
+                        </List>
                     </Accordion.Content>
 
                      <Accordion.Title
