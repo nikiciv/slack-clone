@@ -22,7 +22,9 @@ class SidePanel extends React.Component {
         <UserPanel 
           currentUser={currentUser}
         />
-        <Starred />
+        <Starred 
+          currentUser={currentUser}
+        />
         <Channels 
           currentUser={currentUser}
         />
