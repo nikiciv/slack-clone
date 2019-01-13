@@ -31,6 +31,7 @@ const App = ({ currentUser, currentChannel, isPrivateChannel }) => (
         width={4}
         key={currentChannel && currentChannel.id}
         isPrivateChannel={isPrivateChannel}
+        currentChannel={currentChannel}
       />
     </Grid.Column>
   </Grid>
