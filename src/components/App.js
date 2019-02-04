@@ -9,7 +9,10 @@ import Messages from './Messages';
 
 const App = ({ currentUser, currentChannel, isPrivateChannel, userPosts }) => (
   <Grid columns="equal" className="app" style={{ margin: 0, background: '#eee'}}>
-    <ColorPanel />
+    <ColorPanel 
+      key={currentUser && currentUser.name}
+      currentUser={currentUser}
+    />
     <SidePanel 
       currentUser={currentUser}
       key={currentUser && currentUser.uid}
@@ -29,7 +32,7 @@ const App = ({ currentUser, currentChannel, isPrivateChannel, userPosts }) => (
     <Grid.Column>
       <MetaPanel 
         width={4}
-        key={currentChannel && currentChannel.id}
+        key={currentChannel && currentChannel.name}
         isPrivateChannel={isPrivateChannel}
         currentChannel={currentChannel}
         userPosts={userPosts}
