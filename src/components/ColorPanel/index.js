@@ -1,5 +1,7 @@
 import React from 'react';
 import firebase from '../../firebase';
+import { connect } from "react-redux";
+import { setColors } from "../../actions";
 import { 
     Sidebar, 
     Menu, 
@@ -17,8 +19,24 @@ class ColorPanel extends React.Component {
         isModalOpen: false,
         primary: '',
         secondary: '',
-        usersRef: firebase.database().ref('users'),    
+        usersRef: firebase.database().ref('users'),  
+        userColors: [],  
     };
+
+    componentDidMount() {
+        if(this.props.currentUser) {
+            this.addListener(this.props.currentUser.uid);
+        }
+    }
+
+    addListener = userId => {
+        let userColors = [];
+        this.state.usersRef.child(`${userId}/colors`)
+        .on('child_added', snap => {
+            userColors.unshift(snap.val());
+            this.setState({ userColors });
+        })
+    }
 
     openModal = () => this.setState({ isModalOpen: true });
 
@@ -54,8 +72,29 @@ class ColorPanel extends React.Component {
             })
     }
 
+    displayUserColors = colors =>
+        colors.length > 0 && colors.map((color, i) => (
+            <React.Fragment key={i}>
+                <Divider />
+                <div
+                    className="color__container"
+                    onClick={() => this.props.setColors(color.primary, color.secondary)}
+                >
+                    <div 
+                        className="color__square" 
+                        style={{ background: color.primary }}
+                    >
+                        <div
+                            className="color__overlay"
+                            style={{ background: color.secondary }}
+                        />
+                    </div>
+                </div>
+            </React.Fragment>
+    ));
+
     render() {
-        const { isModalOpen, primary, secondary } = this.state;
+        const { isModalOpen, primary, secondary, userColors } = this.state;
         return(
             <Sidebar
                 as={Menu}
@@ -72,6 +111,7 @@ class ColorPanel extends React.Component {
                     color="blue"
                     onClick={this.openModal}
                 />
+                {this.displayUserColors(userColors)}
                 <Modal 
                     basic
                     open={isModalOpen}
@@ -110,4 +150,7 @@ class ColorPanel extends React.Component {
     }
 }
 
-export default ColorPanel;
+export default connect(
+  null,
+  { setColors }
+)(ColorPanel);
