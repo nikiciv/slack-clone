@@ -16,6 +16,7 @@ class MessageForm extends React.Component {
         uploadTask: null,
         storageRef: firebase.storage().ref(),
         percentUploaded: 0,
+        typingRef: firebase.database().ref('typing'),
     };
 
     openFileModal = () => this.setState({ isFileModalOpen: true });
@@ -109,8 +110,8 @@ class MessageForm extends React.Component {
     }
 
     sendMessage = () => {
-        const { getMessagesRef, currentChannel } = this.props;
-        const { message } = this.state;
+        const { getMessagesRef, currentChannel, currentUser } = this.props;
+        const { message, typingRef } = this.state;
 
         if(message) {
             this.setState({ loading: true });
@@ -124,6 +125,10 @@ class MessageForm extends React.Component {
                         message: '',
                         errors: [],
                     })
+                    typingRef
+                        .child(currentChannel.id)
+                        .child(currentUser.uid)
+                        .remove()
                 })
                 .catch(err => {
                     console.error(err);
@@ -148,6 +153,23 @@ class MessageForm extends React.Component {
         }
     }
 
+    handleKeyDown = () => {
+        const { typingRef, message } = this.state;
+        const { currentChannel, currentUser } = this.props;
+
+        if(message) {
+            typingRef
+                .child(currentChannel.id)
+                .child(currentUser.uid)
+                .set(currentUser.displayName)
+        } else {
+            typingRef
+                .child(currentChannel.id)
+                .child(currentUser.uid)
+                .remove()
+        }
+    }
+
     render() {
         const { 
                 errors, 
@@ -167,6 +189,7 @@ class MessageForm extends React.Component {
                     style={{ marginBottom: '0.7em' }}
                     label={<Button icon={'add'} />}
                     value={message}
+                    onKeyDown={this.handleKeyDown}
                     labelPosition="left"
                     className={
                         errors.some(error => error.message.includes('message')) ? 'error' : ''
