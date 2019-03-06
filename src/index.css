@@ -46,6 +46,11 @@ body {
   padding-bottom: 2em;
 }
 
+.emojipicker {
+  position: absolute;
+  
+}
+
 /* ColorPanel.js */
 
 .color__container {

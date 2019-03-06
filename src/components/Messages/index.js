@@ -86,8 +86,6 @@ class Messages extends React.Component {
           })
       }
     })
-
-    
   };
 
   addUsersStarsListener = (channelId, userId) => {
