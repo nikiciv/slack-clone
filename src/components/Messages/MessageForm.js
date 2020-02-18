@@ -197,6 +197,13 @@ class MessageForm extends React.Component {
       });
   };
 
+  componentWillUnmount() {
+    if (this.state.uploadTask !== null) {
+      this.state.uploadTask.cancel();
+      this.setState({ uploadTask: null });
+    }
+  }
+
   render() {
     // prettier-ignore
     const { errors, message, loading, modal, uploadState, percentUploaded, emojiPicker } = this.state;
